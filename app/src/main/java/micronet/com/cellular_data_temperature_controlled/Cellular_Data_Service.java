@@ -59,7 +59,7 @@ public class Cellular_Data_Service extends Service {
         }
         if (Read_Write_File.readDisabledCountFromFile(context)==""){
                 disabledCount=0;
-                disabledCountValue=Integer.toString(enabledCount);
+                disabledCountValue=Integer.toString(disabledCount);
                 Read_Write_File.writeDisabledCountToFile(disabledCountValue,context);
         }
         else {
@@ -104,7 +104,15 @@ public class Cellular_Data_Service extends Service {
                     }
                     else if (MobileDataManager.getMobileDataState(context) == false) {
                         MobileDataManager.setDataEnabled(context, true);//Enabling Mobile data
-                        increaseEnabledCount();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        if (MobileDataManager.getMobileDataState(context)==true)
+                        {
+                            increaseEnabledCount();
+                        }
                         Log.d(TAG, "Setting mobile data state: " + true);
                         Log.d(TAG, "Increased Enabling Count :" + enabledCount);
                         mobileDataHandler.postDelayed(this, TEN_SECONDS);//Setting post to thirty seconds
@@ -118,8 +126,17 @@ public class Cellular_Data_Service extends Service {
                         return;
                         }
                         else
-                            MobileDataManager.setDataEnabled(context, false);//Disabling the data
+                            MobileDataManager.setDataEnabled(context, false);   //Disabling the data
+                         try {
+                            Thread.sleep(1000);
+                             }
+                         catch (InterruptedException e) {
+                            e.printStackTrace();
+                            }
+                        if(MobileDataManager.getMobileDataState(context)==false)
+                            {
                             increaseDisabledCount();
+                            }
                             Log.d(TAG, "Setting mobile data state: " + false);
                             Log.d(TAG, "Current Disabled Count :" + disabledCount);
                             mobileDataHandler.postDelayed(this, TEN_SECONDS);//setting post to thirty seconds
