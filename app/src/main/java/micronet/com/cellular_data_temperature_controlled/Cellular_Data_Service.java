@@ -63,7 +63,7 @@ public class Cellular_Data_Service extends Service {
                 Read_Write_File.writeDisabledCountToFile(disabledCountValue,context);
         }
         else {
-            disabledCountValue = Read_Write_File.readFromFile(context);
+            disabledCountValue = Read_Write_File.readDisabledCountFromFile(context);
             disabledCount = Integer.parseInt( disabledCountValue);
         }
     }
