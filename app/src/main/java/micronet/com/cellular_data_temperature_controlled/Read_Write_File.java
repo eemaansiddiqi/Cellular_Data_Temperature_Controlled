@@ -148,8 +148,6 @@ public class Read_Write_File {
         String String_pauseStatus=String.valueOf(pauseStatus);
         String timestamp=("Timestamp:   ")+Utils.formatDate(System.currentTimeMillis())+("   "); //Getting current time stamp
         String paused="     Paused Status:  ";
-        String stopc= "     Service Stopped Count:   ";
-        String sc="     Service Started Count (By calling START_SERVICE):    ";
         File file = new File(Dir, "ServiceActivityLog.txt");//Created a Text File to maintain the service activity log
         if(!file.exists()) {
             Log.d(TAG, "File Doesn't exist");

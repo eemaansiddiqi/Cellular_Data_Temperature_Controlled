@@ -20,7 +20,7 @@ public class ServiceManagerReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals(ACTION_PAUSE_SERVICE)) {
-            // TODO: pause service
+            //  pause service
             pauseStatus=true;
             try {
                 sleep(1000);
@@ -33,7 +33,7 @@ public class ServiceManagerReceiver extends BroadcastReceiver {
             Log.d(TAG, "Service Stopped by User   status="+res);
 
         } else if(intent.getAction().equals(ACTION_START_SERVICE) ) {
-            // TODO: start service
+            // start service
             pauseStatus=false;
             try {
                 sleep(1000);
