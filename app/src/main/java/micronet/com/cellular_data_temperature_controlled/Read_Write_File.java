@@ -144,4 +144,38 @@ public class Read_Write_File {
             }
         }
     }
+    public static void serviceActivityLog(Boolean pauseStatus, Context context){
+        String String_pauseStatus=String.valueOf(pauseStatus);
+        String timestamp=("Timestamp:   ")+Utils.formatDate(System.currentTimeMillis())+("   "); //Getting current time stamp
+        String paused="     Paused Status:  ";
+        String stopc= "     Service Stopped Count:   ";
+        String sc="     Service Started Count (By calling START_SERVICE):    ";
+        File file = new File(Dir, "ServiceActivityLog.txt");//Created a Text File to maintain the service activity log
+        if(!file.exists()) {
+            Log.d(TAG, "File Doesn't exist");
+        }
+        try {
+            fileWriter = new FileWriter(file.getAbsoluteFile(), true);
+            bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(timestamp);
+            bufferedWriter.write(TemperatureValues.temperaturevalues);
+            bufferedWriter.write(paused);
+            bufferedWriter.write(String_pauseStatus);
+            bufferedWriter.newLine();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (bufferedWriter!=null)
+                    bufferedWriter.close();
+                if (fileWriter!=null)
+                    fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

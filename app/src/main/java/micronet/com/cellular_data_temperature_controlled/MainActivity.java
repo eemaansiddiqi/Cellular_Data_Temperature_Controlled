@@ -15,4 +15,5 @@ public class MainActivity extends Activity {
         startService(service);
         finish();
     }
+
 }

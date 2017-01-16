@@ -1,6 +1,7 @@
 package micronet.com.cellular_data_temperature_controlled;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -9,8 +10,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Process;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -161,8 +164,10 @@ public class Cellular_Data_Service extends Service {
 
     @Override
     public void onDestroy() {
-        Log.e(TAG,"STOP");
         super.onDestroy();
+        Log.e(TAG,"STOP");
+        mobileDataHandler.removeCallbacks(Temperature_Check);
+        Toast.makeText(this,"Service Stopped",Toast.LENGTH_LONG).show();
     }
 
     @Nullable
