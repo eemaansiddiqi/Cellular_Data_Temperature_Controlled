@@ -55,7 +55,7 @@ public class Cellular_Data_Service extends Service {
         }
         else {
                 enabledCountValue = Read_Write_File.readFromFile(context);
-                enabledCount = Integer.parseInt( enabledCountValue);
+                enabledCount = Integer.parseInt(enabledCountValue);
         }
         if (Read_Write_File.readDisabledCountFromFile(context)==""){
                 disabledCount=0;

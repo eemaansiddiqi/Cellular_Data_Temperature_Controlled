@@ -27,9 +27,15 @@
             android:enabled="true"
             android:exported="false">
         </service>
-        <receiver android:name=".Receiver">
+        <receiver android:name=".BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".ServiceManagerReceiver" android:enabled="true">
+            <intent-filter>
+                <action android:name="micronet.com.cellular_data_temperature_controlled.PAUSE_SERVICE"/>
+                <action android:name="micronet.com.cellular_data_temperature_controlled.START_SERVICE"/>
             </intent-filter>
         </receiver>
     </application>

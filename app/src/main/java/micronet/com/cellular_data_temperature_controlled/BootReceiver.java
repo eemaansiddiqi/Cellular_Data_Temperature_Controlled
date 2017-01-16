@@ -8,7 +8,7 @@ import android.content.Intent;
  * Created by eemaan.siddiqi on 12/15/2016.
  */
 // This class is responsible for starting the service on boot
-public class Receiver extends BroadcastReceiver {
+public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         //Start Monitoring the temperature and Mobile Data Service
