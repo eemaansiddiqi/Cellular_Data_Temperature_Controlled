@@ -13,7 +13,11 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         Intent service = new Intent(this, Cellular_Data_Service.class);
         startService(service);
-        finish();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        finish();
+    }
 }
