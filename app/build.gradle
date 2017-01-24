@@ -11,8 +11,9 @@ android {
         minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
-        versionName "1.5"
+        versionName "1.5.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        archivesBaseName = "Micronet-CellularDataService-$versionName"
     }
     buildTypes {
         release {
