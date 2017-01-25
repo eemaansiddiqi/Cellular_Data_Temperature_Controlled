@@ -90,6 +90,28 @@ public class Cellular_Data_Service extends Service {
             Read_Write_File.LogToFile(disabledCountValue,enabledCountValue, context);
             //Log.d(TAG, "Timestamp:"+Read_Write_File.timestamp +TemperatureValues.temperaturevalues +enabledCountValue);
     }
+    private void enableCellularData(){
+        MobileDataManager.isAirplaneMode(getContentResolver());
+        if(MobileDataManager.isAirplaneMode(getContentResolver())==false){
+            MobileDataManager.setDataEnabled(context, true);//Enabling Mobile data
+            Log.d(TAG, "Setting mobile data state: " + true);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (MobileDataManager.getMobileDataState(context)==true)
+            {
+                increaseEnabledCount();
+                Log.d(TAG, "Increased Enabling Count :" + enabledCount);
+            }
+        }
+        else
+            Log.d(TAG,"Airplane mode is On, Cant enable cellular data");
+    }
+
+
+
     final Runnable Temperature_Check = new Runnable() {
         @Override
         public void run() {
@@ -106,19 +128,8 @@ public class Cellular_Data_Service extends Service {
                         return;
                     }
                     else if (MobileDataManager.getMobileDataState(context) == false) {
-                        MobileDataManager.setDataEnabled(context, true);//Enabling Mobile data
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if (MobileDataManager.getMobileDataState(context)==true)
-                        {
-                            increaseEnabledCount();
-                        }
-                        Log.d(TAG, "Setting mobile data state: " + true);
-                        Log.d(TAG, "Increased Enabling Count :" + enabledCount);
-                        mobileDataHandler.postDelayed(this, TEN_SECONDS);//Setting post to thirty seconds
+                        enableCellularData();
+                        mobileDataHandler.postDelayed(this, TEN_SECONDS);//Setting post to ten seconds
                         return;
                     }
                 }

@@ -1,9 +1,11 @@
 package micronet.com.cellular_data_temperature_controlled;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import java.lang.reflect.InvocationTargetException;
@@ -66,25 +68,10 @@ public class MobileDataManager {
         }
         return false;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public static boolean isAirplaneMode(ContentResolver content) {
+        boolean isAirplaneOn= Settings.System.getInt(content,Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+        return isAirplaneOn;
+    }
 
 
 }

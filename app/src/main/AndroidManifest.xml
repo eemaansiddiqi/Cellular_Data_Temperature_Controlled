@@ -30,7 +30,7 @@
             android:name=".Cellular_Data_Service"
             android:description="@string/service_description"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true">
         </service>
         <receiver android:name=".BootReceiver">
             <intent-filter>
