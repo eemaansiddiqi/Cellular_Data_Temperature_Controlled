@@ -162,6 +162,7 @@ public class Cellular_Data_Service extends Service {
                         return;
                     }
                     else if (MobileDataManager.getMobileDataState(context) == false) {
+                        cellularDisabled=false;
                         enableCellularData();
                         mobileDataHandler.postDelayed(this, TEN_SECONDS);//Setting post to ten seconds
                         return;
