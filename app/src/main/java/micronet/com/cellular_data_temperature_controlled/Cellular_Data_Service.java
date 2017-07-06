@@ -17,12 +17,12 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * Created by eemaan.siddiqi on 12/20/2016.
  */
 public class Cellular_Data_Service extends Service {
+
+    public static final String TAG = "Cellular_Data_Service";
 
     private Context context;
     private Handler mobileDataHandler;
@@ -33,16 +33,17 @@ public class Cellular_Data_Service extends Service {
     private int disabledCount;
     private String disabledCountValue;
     private boolean cellularDisabled=false;
+    private int dataEnabledState=0;
+    private int dataDisabledState=1;
+
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         context = this;
-        if (mobileDataHandler == null) {
-            mobileDataHandler = new Handler(Looper.myLooper());
-            mobileDataHandler.post(Temperature_Check);
-        }
+
         //Creating a Directory if it isn't available
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             File Root = Environment.getExternalStorageDirectory(); //Creating File Storage
@@ -71,6 +72,18 @@ public class Cellular_Data_Service extends Service {
             disabledCountValue = Read_Write_File.readDisabledCountFromFile(context);
             disabledCount = Integer.parseInt( disabledCountValue);
         }
+
+        if(Read_Write_File.readStateFromFile()==""){
+            Read_Write_File.writeStateToFile(Integer.toString(dataDisabledState));
+            cellularDisabled=true;
+        }
+        else cellularDisabled=MobileDataManager.getModifiedCellularDataState();
+
+        if (mobileDataHandler == null) {
+            mobileDataHandler = new Handler(Looper.myLooper());
+            mobileDataHandler.post(Temperature_Check);
+        }
+
         PackageManager p = getPackageManager();
         ComponentName componentName = new ComponentName(this, micronet.com.cellular_data_temperature_controlled.MainActivity.class); // activity which is first time open in manifiest file which is declare as <category android:name="android.intent.category.LAUNCHER" />
         p.setComponentEnabledSetting(componentName,PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
@@ -79,12 +92,12 @@ public class Cellular_Data_Service extends Service {
     //Function that increases the handler count for enabling
     private void increaseEnabledCount()
     {
-        enabledCount++;
-        enabledCountValue = Integer.toString(enabledCount);
-        Read_Write_File.writeToFile( enabledCountValue, context);
-        Log.d(TAG, "increased Enabled Count :" +  enabledCountValue);
-        Read_Write_File.LogToFile(disabledCountValue, enabledCountValue, context);
-        //Log.d(TAG, "Timestamp:"+Read_Write_File.timestamp +TemperatureValues.temperaturevalues +enabledCountValue);
+            enabledCount++;
+            enabledCountValue = Integer.toString(enabledCount);
+            Read_Write_File.writeToFile(enabledCountValue, context);
+            Log.d(TAG, "increased Enabled Count :" +  enabledCountValue);
+            Read_Write_File.LogToFile(disabledCountValue, enabledCountValue, context);
+            //Log.d(TAG, "Timestamp:"+Read_Write_File.timestamp +TemperatureValues.temperaturevalues +enabledCountValue);
     }
     //Function to increase the disabling count and write to a file
     private void increaseDisabledCount()
@@ -100,7 +113,7 @@ public class Cellular_Data_Service extends Service {
         MobileDataManager.isAirplaneMode(getContentResolver());
         if(MobileDataManager.isAirplaneMode(getContentResolver())==false){
             MobileDataManager.setDataEnabled(context, true);//Enabling Mobile data
-            Log.d(TAG, "Setting mobile data state: " + true);
+            Log.d(TAG, "Enabling mobile data state, State= " + true);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -108,6 +121,8 @@ public class Cellular_Data_Service extends Service {
             }
             if (MobileDataManager.getMobileDataState(context)==true)
             {
+                Read_Write_File.writeStateToFile(Integer.toString(dataEnabledState));
+                cellularDisabled=false;
                 increaseEnabledCount();
                 Log.d(TAG, "Increased Enabling Count :" + enabledCount);
             }
@@ -115,8 +130,6 @@ public class Cellular_Data_Service extends Service {
         else
             Log.d(TAG,"Airplane mode is On, Cant enable cellular data");
     }
-
-
 
     final Runnable Temperature_Check = new Runnable() {
         @Override
@@ -128,29 +141,32 @@ public class Cellular_Data_Service extends Service {
 
             try {
                 TemperatureValues.HigherTemp(context);
-                Log.d(TAG, "enabledcount=" + enabledCount);
+                Log.d(TAG, "enabledCount=" + enabledCount);
                 TemperatureValues.NormalTemp(context);
+                cellularDisabled=MobileDataManager.getModifiedCellularDataState();
+                Log.d(TAG, "cellularDisabledState= "+cellularDisabled);
 
                 if (TemperatureValues.HighTempResult == true)
                     {
                         if (MobileDataManager.getMobileDataState(context) == false) {
+                            Log.d(TAG,"Mobile Data already disabled! (High Temperatures observed!) ");
                             mobileDataHandler.postDelayed(this, TWELVE_SECONDS);
                         return;
                         }
                         else
-                            cellularDisabled=true;
-                            MobileDataManager.setDataEnabled(context, false);   //Disabling the data
+                            MobileDataManager.setDataEnabled(context, false);   //Disabling cellular data
                          try {
                             Thread.sleep(1000);
                              }
                          catch (InterruptedException e) {
                             e.printStackTrace();
                             }
-                        if(MobileDataManager.getMobileDataState(context)==false)
-                            {
+                        if(MobileDataManager.getMobileDataState(context)==false) {
+                            Read_Write_File.writeStateToFile(Integer.toString(dataDisabledState));
+                            cellularDisabled=true;
                             increaseDisabledCount();
                             }
-                            Log.d(TAG, "Setting mobile data state: " + false);
+                            Log.d(TAG, "Disabling mobile data state, State= " + false);
                             Log.d(TAG, "Current Disabled Count :" + disabledCount);
                             mobileDataHandler.postDelayed(this, TEN_SECONDS);//setting post to thirty seconds
                             return;
@@ -158,11 +174,11 @@ public class Cellular_Data_Service extends Service {
 
                 else if (TemperatureValues.NormalTempResult == true && cellularDisabled==true) {
                     if (MobileDataManager.isMobileConnected(context) == true){//If Cellular Data is already turned ON
+                        Log.d(TAG,"Mobile Data already enabled! (All cores are below 80!) ");
                         mobileDataHandler.postDelayed(this, TWELVE_SECONDS);//Do Nothing and set post to 10 seconds
                         return;
                     }
                     else if (MobileDataManager.getMobileDataState(context) == false) {
-                        cellularDisabled=false;
                         enableCellularData();
                         mobileDataHandler.postDelayed(this, TEN_SECONDS);//Setting post to ten seconds
                         return;
