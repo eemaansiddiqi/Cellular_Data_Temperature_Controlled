@@ -47,9 +47,9 @@ public class Cellular_Data_Service extends Service {
         //Creating a Directory if it isn't available
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             File Root = Environment.getExternalStorageDirectory(); //Creating File Storage
-            Read_Write_File.Dir = new File(Root.getAbsolutePath() + "/MicronetService");
-            if (!Read_Write_File.Dir.exists()) {
-                Read_Write_File.Dir.mkdir();
+            Read_Write_File.logDir = new File(Root.getAbsolutePath() + "/MicronetService");
+            if (!Read_Write_File.logDir.exists()) {
+                Read_Write_File.logDir.mkdir();
             }
         }
 
@@ -73,11 +73,11 @@ public class Cellular_Data_Service extends Service {
             disabledCount = Integer.parseInt( disabledCountValue);
         }
 
-        if(Read_Write_File.readStateFromFile()==""){
-            Read_Write_File.writeStateToFile(Integer.toString(dataDisabledState));
+        if(Read_Write_File.readStateFromFile(context)==""){
+            Read_Write_File.writeStateToFile(Integer.toString(dataDisabledState), context);
             cellularDisabled=true;
         }
-        else cellularDisabled=MobileDataManager.getModifiedCellularDataState();
+        else cellularDisabled=MobileDataManager.getModifiedCellularDataState(context);
 
         if (mobileDataHandler == null) {
             mobileDataHandler = new Handler(Looper.myLooper());
@@ -121,7 +121,7 @@ public class Cellular_Data_Service extends Service {
             }
             if (MobileDataManager.getMobileDataState(context)==true)
             {
-                Read_Write_File.writeStateToFile(Integer.toString(dataEnabledState));
+                Read_Write_File.writeStateToFile(Integer.toString(dataEnabledState), context);
                 cellularDisabled=false;
                 increaseEnabledCount();
                 Log.d(TAG, "Increased Enabling Count :" + enabledCount);
@@ -143,7 +143,7 @@ public class Cellular_Data_Service extends Service {
                 TemperatureValues.HigherTemp(context);
                 Log.d(TAG, "enabledCount=" + enabledCount);
                 TemperatureValues.NormalTemp(context);
-                cellularDisabled=MobileDataManager.getModifiedCellularDataState();
+                cellularDisabled=MobileDataManager.getModifiedCellularDataState(context);
                 Log.d(TAG, "cellularDisabledState= "+cellularDisabled);
 
                 if (TemperatureValues.HighTempResult == true)
@@ -162,7 +162,7 @@ public class Cellular_Data_Service extends Service {
                             e.printStackTrace();
                             }
                         if(MobileDataManager.getMobileDataState(context)==false) {
-                            Read_Write_File.writeStateToFile(Integer.toString(dataDisabledState));
+                            Read_Write_File.writeStateToFile(Integer.toString(dataDisabledState), context);
                             cellularDisabled=true;
                             increaseDisabledCount();
                             }

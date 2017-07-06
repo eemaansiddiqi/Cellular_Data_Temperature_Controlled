@@ -76,15 +76,15 @@ public class MobileDataManager {
         return isAirplaneOn;
     }
 
-    public static boolean getModifiedCellularDataState(){
+    public static boolean getModifiedCellularDataState(Context context){
         boolean state=true;
         String stateValueRead;
         int stateRead;
-        stateValueRead=Read_Write_File.readStateFromFile();
+        stateValueRead=Read_Write_File.readStateFromFile(context);
             if(stateValueRead==""){
                 //If the file corrupts due to some reason, Enable cell data (Might override user's settings) if all the cores are below 80.
                 Log.e(TAG, "Error: MobileDataState.txt is empty! Return Disabled State as true");
-                Read_Write_File.writeStateToFile(Integer.toString(1));
+                Read_Write_File.writeStateToFile(Integer.toString(1),context);
                 state= true;
                 return state;
             }
