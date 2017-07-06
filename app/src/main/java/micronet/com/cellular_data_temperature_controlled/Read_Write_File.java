@@ -2,7 +2,6 @@ package micronet.com.cellular_data_temperature_controlled;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,21 +11,65 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import static android.content.ContentValues.TAG;
 
 /**
  * Created by eemaan.siddiqi on 12/20/2016.
  */
 
 public class Read_Write_File {
+
+    public static final String TAG = "Read_Write_File";
     //Declaring the Directory
     public static File Dir;
     public static BufferedWriter bufferedWriter = null;
     public static FileWriter fileWriter = null;
 
+
+    public static void writeStateToFile(String handlerValue){
+        File file = new File(Dir, "MobileDataState.txt"); //Created a Text File for storing the enabled count
+        if(!file.exists()) {
+            //If MobileDataState.txt is not found, reset the state to 0
+            //If the state is 0 - Service hasn't disabled cellular data else service has disabled it.
+            handlerValue = "1";
+        }
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            fileOutputStream.write(handlerValue.getBytes());
+            fileOutputStream.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "MobileDataState.txt: File write failed: " + e.toString());
+        }
+    }
+
+    //Read Function
+    public static String readStateFromFile() {
+
+        String ret = "";
+        File file = new File(Dir, "MobileDataState.txt"); //Created a Text File to store the state of cellular data if the service managed it at any point.
+        if(!file.exists()) {
+            //ret= "1"; // If the file doesn't exist, return 1. The service will enable cellular data if all the temperatures are below 80 in this case. This will also happen when the serice starts for teh first time.
+            return ret;}
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String receiveString = "";
+            StringBuilder stringBuilder = new StringBuilder();
+
+            while ((receiveString = bufferedReader.readLine()) != null) {
+                stringBuilder.append(receiveString);
+            }
+            fileReader.close();
+            ret = stringBuilder.toString();
+        } catch (FileNotFoundException e) {
+            Log.e(TAG, "MobileDataState.txt: File not found: " + e.toString());
+        } catch (Exception e) {
+            Log.e(TAG, "MobileDataState.txt: Can not read file: " + e.toString());
+        }
+        return ret;
+    }
+
     //Write function
-
-
     public static void writeToFile(String handlerValue, Context context){
         File file = new File(Dir, "MobileDataEnabled.txt"); //Created a Text File for storing the enabled count
         if(!file.exists()) {
@@ -39,7 +82,7 @@ public class Read_Write_File {
             fileOutputStream.close();
         }
         catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+            Log.e("Exception", "MobileDataEnabled.txt: File write failed: " + e.toString());
         }
     }
     //Read Function
@@ -60,9 +103,9 @@ public class Read_Write_File {
             fileReader.close();
             ret = stringBuilder.toString();
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "File not found: " + e.toString());
+            Log.e(TAG, "MobileDataEnabled.txt: File not found: " + e.toString());
         } catch (Exception e) {
-            Log.e(TAG, "Can not read file: " + e.toString());
+            Log.e(TAG, "MobileDataEnabled.txt: Can not read file: " + e.toString());
         }
         return ret;
     }
@@ -80,7 +123,7 @@ public class Read_Write_File {
             fileOutputStream.close();
         }
         catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+            Log.e("Exception", "MobileDataDisabled.txt: File write failed: " + e.toString());
         }
     }
     //Read Function for disabled Count
@@ -103,9 +146,9 @@ public class Read_Write_File {
             ret = stringBuilder.toString();
 
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "File not found: " + e.toString());
+            Log.e(TAG, "MobileDataDisabled.txt: File not found: " + e.toString());
         } catch (Exception e) {
-            Log.e(TAG, "Can not read file: " + e.toString());
+            Log.e(TAG, "MobileDataDisabled.txt: Can not read file: " + e.toString());
         }
         return ret;
     }
@@ -116,7 +159,7 @@ public class Read_Write_File {
         String dc= "    DisabledCount:   ";
         File file = new File(Dir, "ServiceLog.txt");//Created a Text File to maintain the service activity log
         if(!file.exists()) {
-            Log.d(TAG, "File Doesn't exist");
+            Log.d(TAG, "ServiceLog.txt: File Doesn't exist");
         }
         try {
             fileWriter = new FileWriter(file.getAbsoluteFile(), true);
@@ -150,7 +193,7 @@ public class Read_Write_File {
         String paused="     Paused Status:  ";
         File file = new File(Dir, "ServiceActivityLog.txt");//Created a Text File to maintain the service activity log
         if(!file.exists()) {
-            Log.d(TAG, "File Doesn't exist");
+            Log.d(TAG, "ServiceActivityLog.txt: File Doesn't exist");
         }
         try {
             fileWriter = new FileWriter(file.getAbsoluteFile(), true);
